@@ -1,30 +1,36 @@
+# comment / uncomment categories desired to test and plot!
+# this script assumes organization (symmetrical) around Lag = 0
+# imports dyad file that contains outcome group
+
 library(crqa)
 library(lme4)
 library(ggplot2)
-setwd('~/Dropbox/projects/studies/alex_main_conflict_data')
+setwd('~/Dropbox/projects/studies/alex_main_conflict_data/')
 wsz = 20 # width of the diagonal recurrence profile
-  
+
 # various categories
 #neg
 #a_target_emotion = c('contempt' , 'criticism' , 'stonewalling' , 'belligerence' , 'defensiveness' , 'domineering' , 'anger')
 #p_target_emotion = c('contempt' , 'criticism' , 'stonewalling' , 'belligerence' , 'defensiveness' , 'domineering' , 'anger')
 #pos
-#a_target_emotion = c('affection', 'enthusiasm' , 'humor')
-#p_target_emotion = c('affection', 'enthusiasm' , 'humor')
+a_target_emotion = c('affection', 'enthusiasm' , 'humor')
+p_target_emotion = c('affection', 'enthusiasm' , 'humor')
 #val
-a_target_emotion = c('backchannels' , 'direct expressions of understanding' , 'sentence finishing ' , 'paraphrasing' , 'mirroring with validation'  , 'apologizing' , 'identification' , 'acknowledging different point of view')
-p_target_emotion = c('backchannels' , 'direct expressions of understanding' , 'sentence finishing ' , 'paraphrasing' , 'mirroring with validation'  , 'apologizing' , 'identification' , 'acknowledging different point of view')
-#int
+#a_target_emotion = c('backchannels' , 'direct expressions of understanding' , 'sentence finishing ' , 'paraphrasing' , 'mirroring with validation'  , 'apologizing' , 'identification' , 'acknowledging different point of view')
+#p_target_emotion = c('backchannels' , 'direct expressions of understanding' , 'sentence finishing ' , 'paraphrasing' , 'mirroring with validation'  , 'apologizing' , 'identification' , 'acknowledging different point of view')
+#int -- why do these seem absent?
 #a_target_emotion = c('mirroring with interest' , 'positive nonverbal attention' , 'open-ended questions' , 'elaboration and clarification seeking')
 #p_target_emotion = c('mirroring with interest' , 'positive nonverbal attention' , 'open-ended questions' , 'elaboration and clarification seeking')
 
-dyads = c(2:4,6:8,10:49)
+dyads = read.csv('drp-with-gcm/dyads.csv')
 
 drps = data.frame()
 
-for (dyad in dyads) {
-  
-  a = read.table(paste('Cross-Recurrence-Data_cleaned-and-renamed/',dyad,'.txt',sep=''),skip=1,sep='\t')  
+max_lag_loc = c()
+
+for (dyad in dyads[,1]) {
+  print(dyad)
+  a = read.table(paste('chosen dyads/All/',dyad,'.txt',sep=''),skip=1,sep='\t')  
   
   parent = as.character(tolower(a[,2])) # column 2, all rows, turn it into string
   adolescent = as.character(tolower(a[,3])) # column 3, all rows, turn it into string
@@ -55,25 +61,26 @@ for (dyad in dyads) {
   # make sure that there are targets occurring in this dyad, and enough data (wsz)
   if (sum(pix==which(uniques=="target"))>0 & sum(aix==which(uniques=="target"))>0 & length(pix)>wsz*2) {
     drp_results = drpdfromts(pix,aix,ws=wsz,datatype="categorical")      
-    if (dyad==2) {
-      drps = data.frame(dyad,-wsz:wsz,drp_results$profile) # if the first dyad, start the data frame
+    if (dim(drps)[1]==0) {
+      drps = data.frame(dyad,-wsz:wsz,drp_results$profile,dyads[dyads[,1]==dyad,2]) # if the first dyad, start the data frame
     }
     else {
-      drps = rbind(drps,data.frame(dyad,-wsz:wsz,drp_results$profile)) # subsequently, rbind it
+      drps = rbind(drps,data.frame(dyad,-wsz:wsz,drp_results$profile,dyads[dyads[,1]==dyad,2])) # subsequently, rbind it
     }
+    max_lag_loc = c(max_lag_loc,drp_results$maxlag-21)
   }
 }
 
-colnames(drps) = list('dyad,','Lag','RR')
+colnames(drps) = list('dyad,','Lag','RR','Outcome')
 drps$quadratic = drps$Lag^2 # look at the quadratic term, assuming organization around Lag = 0
 drps$dyad = as.factor(drps$dyad)
-lmo = lmer(RR~Lag+quadratic+(1+Lag+quadratic|dyad),data=drps)
+lmo = lmer(RR~quadratic+Outcome+(1+quadratic|dyad),data=drps)
 coefs = data.frame(summary(lmo)@coefs)
 coefs$p = 2*(1-pnorm(abs(coefs$t.value)))
 coefs
 
 p <- ggplot(drps,aes(Lag,RR)) 
-p + stat_smooth(method = "loess", formula = y ~ x) # spec loess because > 1,000 points
+p + stat_smooth(aes(fill=factor(Outcome)),method = "loess", formula = y ~ x) # spec loess because > 1,000 points
 # http://docs.ggplot2.org/0.9.3.1/stat_smooth.html
 
 
