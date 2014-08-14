@@ -6,7 +6,7 @@ library(crqa)
 library(lme4)
 library(ggplot2)
 setwd('~/Dropbox/projects/studies/alex_main_conflict_data/')
-wsz = 20 # width of the diagonal recurrence profile
+wsz = 30 # width of the diagonal recurrence profile
 
 # various categories
 #neg
@@ -14,10 +14,10 @@ wsz = 20 # width of the diagonal recurrence profile
 #p_target_emotion = c('contempt' , 'criticism' , 'stonewalling' , 'belligerence' , 'defensiveness' , 'domineering' , 'anger')
 #pos
 a_target_emotion = c('affection', 'enthusiasm' , 'humor')
-p_target_emotion = c('affection', 'enthusiasm' , 'humor')
+#p_target_emotion = c('affection', 'enthusiasm' , 'humor')
 #val
 #a_target_emotion = c('backchannels' , 'direct expressions of understanding' , 'sentence finishing ' , 'paraphrasing' , 'mirroring with validation'  , 'apologizing' , 'identification' , 'acknowledging different point of view')
-#p_target_emotion = c('backchannels' , 'direct expressions of understanding' , 'sentence finishing ' , 'paraphrasing' , 'mirroring with validation'  , 'apologizing' , 'identification' , 'acknowledging different point of view')
+p_target_emotion = c('backchannels' , 'direct expressions of understanding' , 'sentence finishing ' , 'paraphrasing' , 'mirroring with validation'  , 'apologizing' , 'identification' , 'acknowledging different point of view')
 #int -- why do these seem absent?
 #a_target_emotion = c('mirroring with interest' , 'positive nonverbal attention' , 'open-ended questions' , 'elaboration and clarification seeking')
 #p_target_emotion = c('mirroring with interest' , 'positive nonverbal attention' , 'open-ended questions' , 'elaboration and clarification seeking')
@@ -74,7 +74,7 @@ for (dyad in dyads[,1]) {
 colnames(drps) = list('dyad,','Lag','RR','Outcome')
 drps$quadratic = drps$Lag^2 # look at the quadratic term, assuming organization around Lag = 0
 drps$dyad = as.factor(drps$dyad)
-lmo = lmer(RR~quadratic+Outcome+(1+quadratic|dyad),data=drps)
+lmo = lmer(RR~quadratic*Outcome+(1+quadratic|dyad),data=drps)
 coefs = data.frame(summary(lmo)@coefs)
 coefs$p = 2*(1-pnorm(abs(coefs$t.value)))
 coefs

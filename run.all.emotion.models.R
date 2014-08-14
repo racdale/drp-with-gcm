@@ -5,7 +5,7 @@ library(crqa)
 library(lme4)
 library(ggplot2)
 setwd('~/Dropbox/projects/studies/alex_main_conflict_data/')
-wsz = 20 # width of the diagonal recurrence profile
+wsz = 30 # width of the diagonal recurrence profile
   
 # various categories
 #neg
@@ -15,8 +15,8 @@ wsz = 20 # width of the diagonal recurrence profile
 #a_target_emotion = c('affection', 'enthusiasm' , 'humor')
 #p_target_emotion = c('affection', 'enthusiasm' , 'humor')
 #val
-#a_target_emotion = c('backchannels' , 'direct expressions of understanding' , 'sentence finishing ' , 'paraphrasing' , 'mirroring with validation'  , 'apologizing' , 'identification' , 'acknowledging different point of view')
-#p_target_emotion = c('backchannels' , 'direct expressions of understanding' , 'sentence finishing ' , 'paraphrasing' , 'mirroring with validation'  , 'apologizing' , 'identification' , 'acknowledging different point of view')
+a_target_emotion = c('backchannels' , 'direct expressions of understanding' , 'sentence finishing ' , 'paraphrasing' , 'mirroring with validation'  , 'apologizing' , 'identification' , 'acknowledging different point of view')
+p_target_emotion = c('backchannels' , 'direct expressions of understanding' , 'sentence finishing ' , 'paraphrasing' , 'mirroring with validation'  , 'apologizing' , 'identification' , 'acknowledging different point of view')
 #int -- why do these seem absent?
 #a_target_emotion = c('mirroring with interest' , 'positive nonverbal attention' , 'open-ended questions' , 'elaboration and clarification seeking')
 #p_target_emotion = c('mirroring with interest' , 'positive nonverbal attention' , 'open-ended questions' , 'elaboration and clarification seeking')
